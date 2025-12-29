@@ -4,8 +4,6 @@ Interactive visualization of the [Lobste.rs](https://lobste.rs) user invitation 
 
 **[View Live Demo](https://alexjacobs08.github.io/lobsters-graph/)**
 
-![Screenshot](https://github.com/alexjacobs08/lobsters-graph/raw/main/screenshot.png)
-
 ## Features
 
 - **19,000+ users** visualized in a radial tree layout
@@ -32,7 +30,6 @@ Interactive visualization of the [Lobste.rs](https://lobste.rs) user invitation 
 ## Local Development
 
 ```bash
-cd docs
 python3 -m http.server 8000
 # Open http://localhost:8000
 ```
