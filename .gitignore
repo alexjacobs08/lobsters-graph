@@ -2,9 +2,6 @@
 .env
 .venv/
 
-# Raw scraped data (root level only)
-/data/
-
 # macOS
 .DS_Store
 

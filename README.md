@@ -4,7 +4,7 @@ Interactive visualization of the [Lobste.rs](https://lobste.rs) user invitation 
 
 **[View Live Demo](https://alexjacobs08.github.io/lobsters-graph/)**
 
-![Screenshot](https://github.com/alexjacobs08/lobsters-graph/raw/main/docs/screenshot.png)
+![Screenshot](https://github.com/alexjacobs08/lobsters-graph/raw/main/screenshot.png)
 
 ## Features
 
