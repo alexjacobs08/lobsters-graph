@@ -83,6 +83,15 @@
             font-weight: 400;
         }
 
+        .github-link {
+            color: rgba(255,255,255,0.5);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .github-link:hover {
+            color: #fff;
+        }
+
         #search {
             width: 100%;
             padding: 10px 14px;
@@ -749,7 +758,7 @@
         <div id="welcome-modal">
             <div class="welcome-content">
                 <div class="welcome-header">
-                    <span class="welcome-icon">🦞</span>
+                    <span class="welcome-icon"></span>
                     <h2>Lobste.rs Invitation Graph</h2>
                 </div>
                 <p class="welcome-intro">
@@ -758,15 +767,15 @@
                 </p>
                 <div class="welcome-features">
                     <div class="welcome-feature">
-                        <span class="feature-icon">🔍</span>
+                        <span class="feature-icon">-</span>
                         <span>Click any node to see who invited them and who they've invited</span>
                     </div>
                     <div class="welcome-feature">
-                        <span class="feature-icon">🌳</span>
+                        <span class="feature-icon">-</span>
                         <span>Click "Invitation Tree" to highlight someone's entire downstream network</span>
                     </div>
                     <div class="welcome-feature">
-                        <span class="feature-icon">🎨</span>
+                        <span class="feature-icon">-</span>
                         <span>Node colors show karma (yellow/red = high) and invite count (cyan = many invites)</span>
                     </div>
                 </div>
@@ -782,7 +791,7 @@
                 <div class="logo-icon">🦞</div>
                 <h1>Lobste.rs Graph</h1>
             </div>
-            <p class="subtitle">Invitation network visualization</p>
+            <p class="subtitle">Invitation network visualization · <a href="https://github.com/alexjacobs08/lobsters-graph" target="_blank" class="github-link">GitHub</a></p>
 
             <div class="search-wrapper">
                 <input type="text" id="search" placeholder="Search users..." autocomplete="off">

@@ -39,4 +39,4 @@ python3 -m http.server 8000
 
 ## Data
 
-The graph data was scraped from the public [Lobste.rs user tree](https://lobste.rs/users/tree). Data is static as of December 2024.
+The graph data was scraped from the public [Lobste.rs user tree](https://lobste.rs/users/tree). Data is static as of December 2025.
