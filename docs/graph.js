@@ -1141,4 +1141,34 @@ window.highlightTopInviters = highlightTopInviters;
 window.resetHighlight = resetHighlight;
 window.highlightDescendants = highlightDescendants;
 
-document.addEventListener('DOMContentLoaded', initGraph);
+// Mobile menu toggle
+function setupMobileMenu() {
+    const toggle = document.getElementById('mobile-toggle');
+    const controls = document.getElementById('controls');
+    if (!toggle || !controls) return;
+
+    toggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        controls.classList.toggle('open');
+        toggle.textContent = controls.classList.contains('open') ? '✕' : '☰';
+    });
+
+    // Close menu when clicking on the graph
+    document.getElementById('sigma-container')?.addEventListener('click', () => {
+        controls.classList.remove('open');
+        toggle.textContent = '☰';
+    });
+
+    // Close menu when selecting a node from the list
+    controls.addEventListener('click', (e) => {
+        if (e.target.closest('.top-list-item')) {
+            controls.classList.remove('open');
+            toggle.textContent = '☰';
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initGraph();
+    setupMobileMenu();
+});

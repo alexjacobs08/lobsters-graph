@@ -523,10 +523,96 @@
         .search-wrapper {
             position: relative;
         }
+
+        /* Mobile toggle button */
+        #mobile-toggle {
+            display: none;
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            z-index: 1001;
+            background: rgba(15, 15, 25, 0.9);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: #fff;
+            font-size: 1.2em;
+            cursor: pointer;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            #mobile-toggle {
+                display: block;
+            }
+
+            #controls {
+                left: 0;
+                top: 0;
+                width: 280px;
+                height: 100vh;
+                max-height: 100vh;
+                border-radius: 0;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 1000;
+            }
+
+            #controls.open {
+                transform: translateX(0);
+            }
+
+            #node-detail {
+                width: 280px;
+                right: -280px;
+                transition: right 0.3s ease;
+            }
+
+            #node-detail.visible {
+                right: 0;
+            }
+
+            .zoom-indicator {
+                bottom: 16px;
+                left: 16px;
+                right: auto;
+            }
+
+            .lod-indicator {
+                bottom: 16px;
+                right: 16px;
+            }
+
+            /* Smaller touch targets */
+            .btn-group button {
+                padding: 8px 12px;
+                font-size: 0.75em;
+            }
+
+            .top-list-item {
+                padding: 8px 10px;
+            }
+
+            #search {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #controls {
+                width: 100%;
+            }
+
+            #node-detail {
+                width: 100%;
+                right: -100%;
+            }
+        }
     </style>
 </head>
 <body>
     <div id="container">
+        <button id="mobile-toggle">☰</button>
         <div id="sigma-container"></div>
 
         <div id="loading">

@@ -1,14 +1,9 @@
-# Python
-.venv/
-__pycache__/
-*.pyc
-
 # Environment
 .env
+.venv/
 
-# Data (large/generated files)
-data/users.db
-data/users.html
+# Raw scraped data (root level only)
+/data/
 
 # macOS
 .DS_Store
