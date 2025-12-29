@@ -524,6 +524,126 @@
             position: relative;
         }
 
+        /* Welcome Modal */
+        #welcome-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        #welcome-modal.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .welcome-content {
+            background: linear-gradient(145deg, rgba(30, 30, 45, 0.98), rgba(20, 20, 35, 0.98));
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .welcome-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .welcome-icon {
+            font-size: 2.5em;
+        }
+
+        .welcome-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .welcome-intro {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .welcome-intro a {
+            color: #ff6b6b;
+            text-decoration: none;
+        }
+
+        .welcome-intro a:hover {
+            text-decoration: underline;
+        }
+
+        .welcome-features {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .welcome-feature {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .feature-icon {
+            font-size: 1.2em;
+            flex-shrink: 0;
+        }
+
+        #welcome-close {
+            width: 100%;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a8a0 100%);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        #welcome-close:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(78, 205, 196, 0.3);
+        }
+
+        .welcome-remember {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 16px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85em;
+            cursor: pointer;
+        }
+
+        .welcome-remember input {
+            cursor: pointer;
+        }
+
         /* Mobile toggle button */
         #mobile-toggle {
             display: none;
@@ -624,6 +744,37 @@
             <span class="tt-name"></span>
             <span class="tt-karma"></span>
             <span class="tt-invites"></span>
+        </div>
+
+        <div id="welcome-modal">
+            <div class="welcome-content">
+                <div class="welcome-header">
+                    <span class="welcome-icon">🦞</span>
+                    <h2>Lobste.rs Invitation Graph</h2>
+                </div>
+                <p class="welcome-intro">
+                    <a href="https://lobste.rs" target="_blank">Lobste.rs</a> is a technology-focused community where membership is by invitation only.
+                    This visualization shows the <strong>entire invitation tree</strong> of 19,000+ users.
+                </p>
+                <div class="welcome-features">
+                    <div class="welcome-feature">
+                        <span class="feature-icon">🔍</span>
+                        <span>Click any node to see who invited them and who they've invited</span>
+                    </div>
+                    <div class="welcome-feature">
+                        <span class="feature-icon">🌳</span>
+                        <span>Click "Invitation Tree" to highlight someone's entire downstream network</span>
+                    </div>
+                    <div class="welcome-feature">
+                        <span class="feature-icon">🎨</span>
+                        <span>Node colors show karma (yellow/red = high) and invite count (cyan = many invites)</span>
+                    </div>
+                </div>
+                <button id="welcome-close">Explore the Graph</button>
+                <label class="welcome-remember">
+                    <input type="checkbox" id="welcome-dont-show"> Don't show this again
+                </label>
+            </div>
         </div>
 
         <div id="controls">

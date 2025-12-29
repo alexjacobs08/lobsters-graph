@@ -1168,7 +1168,48 @@ function setupMobileMenu() {
     });
 }
 
+// Welcome modal
+function setupWelcomeModal() {
+    const modal = document.getElementById('welcome-modal');
+    const closeBtn = document.getElementById('welcome-close');
+    const dontShowCheckbox = document.getElementById('welcome-dont-show');
+
+    if (!modal || !closeBtn) return;
+
+    // Check if user has dismissed before
+    if (localStorage.getItem('lobsters-graph-welcome-dismissed')) {
+        return;
+    }
+
+    // Show modal after a short delay
+    setTimeout(() => {
+        modal.classList.add('visible');
+    }, 500);
+
+    closeBtn.addEventListener('click', () => {
+        modal.classList.remove('visible');
+        if (dontShowCheckbox?.checked) {
+            localStorage.setItem('lobsters-graph-welcome-dismissed', 'true');
+        }
+    });
+
+    // Close on background click
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.remove('visible');
+        }
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('visible')) {
+            modal.classList.remove('visible');
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initGraph();
     setupMobileMenu();
+    setupWelcomeModal();
 });
