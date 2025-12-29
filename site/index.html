@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lobste.rs User Graph</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: radial-gradient(ellipse at 50% 0%, #1a1a2e 0%, #0f0f1a 50%, #080810 100%);
+            color: #e8e8f0;
+            overflow: hidden;
+        }
+
+        #container { width: 100vw; height: 100vh; position: relative; }
+        #sigma-container {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+        }
+
+        /* Hide Sigma's default hover label box */
+        .sigma-hover-label, .sigma-label-hover { display: none !important; }
+
+        /* Glassmorphism Controls Panel */
+        #controls {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            background: rgba(15, 15, 25, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 20px;
+            border-radius: 16px;
+            width: 290px;
+            max-height: calc(100vh - 48px);
+            overflow-y: auto;
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        #controls::-webkit-scrollbar { width: 4px; }
+        #controls::-webkit-scrollbar-track { background: transparent; }
+        #controls::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+        }
+
+        #controls h1 {
+            font-size: 1.25em;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.02em;
+        }
+
+        #controls .subtitle {
+            font-size: 0.8em;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 16px;
+            font-weight: 400;
+        }
+
+        #search {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 13px;
+            font-family: inherit;
+            margin-bottom: 16px;
+            transition: all 0.2s ease;
+        }
+        #search::placeholder { color: rgba(255,255,255,0.3); }
+        #search:focus {
+            outline: none;
+            border-color: rgba(78, 205, 196, 0.5);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
+        }
+
+        .section-title {
+            font-size: 0.7em;
+            color: rgba(255,255,255,0.35);
+            margin: 16px 0 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 600;
+        }
+
+        /* Modern Button Group */
+        .button-group {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .button-group button {
+            flex: 1;
+            padding: 8px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            color: rgba(255,255,255,0.6);
+            cursor: pointer;
+            font-size: 0.75em;
+            font-family: inherit;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .button-group button:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+        }
+
+        .button-group button.active {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44b8b0 100%);
+            color: #000;
+            border-color: transparent;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(78, 205, 196, 0.25);
+        }
+
+        .button-group button.karma.active {
+            background: linear-gradient(135deg, #ffd93d 0%, #f5c800 100%);
+            box-shadow: 0 4px 12px rgba(255, 217, 61, 0.25);
+        }
+
+        .button-group button.inviters.active {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.25);
+        }
+
+        /* Stats Card */
+        .stats {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 14px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+        .stats-row:last-child { margin-bottom: 0; }
+        .stat-label { color: rgba(255,255,255,0.4); font-size: 0.8em; }
+        .stat-value {
+            font-weight: 600;
+            color: #4ecdc4;
+            font-size: 0.95em;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Filter Slider */
+        .filter-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            font-size: 0.8em;
+        }
+        .filter-row label { color: rgba(255,255,255,0.4); min-width: 70px; }
+        .filter-row input[type="range"] {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+        }
+        .filter-row input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            background: #4ecdc4;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(78, 205, 196, 0.4);
+        }
+        .filter-row .value {
+            color: #4ecdc4;
+            min-width: 40px;
+            text-align: right;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Top Inviters List */
+        .top-inviters {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            max-height: 180px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .top-inviters::-webkit-scrollbar { width: 3px; }
+        .top-inviters::-webkit-scrollbar-track { background: transparent; }
+        .top-inviters::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+        .inviter-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: background 0.15s ease;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .inviter-row:last-child { border-bottom: none; }
+        .inviter-row:hover { background: rgba(78, 205, 196, 0.1); }
+        .inviter-name {
+            color: #4ecdc4;
+            font-weight: 500;
+        }
+        .inviter-count {
+            color: rgba(255,255,255,0.3);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Legend */
+        .legend {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 6px 0;
+            font-size: 0.75em;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        /* Bottom Indicators */
+        .bottom-indicator {
+            position: absolute;
+            bottom: 24px;
+            background: rgba(15, 15, 25, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.75em;
+            color: rgba(255,255,255,0.5);
+            border: 1px solid rgba(255,255,255,0.08);
+            font-variant-numeric: tabular-nums;
+        }
+
+        #zoom-indicator { left: 24px; }
+        #lod-info { right: 24px; }
+
+        /* Node Detail Panel */
+        #node-detail {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: rgba(15, 15, 25, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 20px;
+            border-radius: 16px;
+            width: 320px;
+            max-height: calc(100vh - 48px);
+            overflow-y: auto;
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            display: none;
+            transform: translateX(20px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        #node-detail.visible {
+            display: block;
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        #node-detail h2 {
+            color: #fff;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        #node-detail .close-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: rgba(255,255,255,0.5);
+            font-size: 1.1em;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        #node-detail .close-btn:hover {
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+        }
+
+        .detail-row { margin: 10px 0; }
+        .detail-label {
+            font-size: 0.7em;
+            color: rgba(255,255,255,0.35);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+        }
+        .detail-value { font-size: 0.9em; color: rgba(255,255,255,0.8); }
+        .detail-value a { color: #4ecdc4; text-decoration: none; font-weight: 500; }
+        .detail-value a:hover { text-decoration: underline; }
+
+        .badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+
+        .karma-badge {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(135deg, #ffd93d 0%, #f5c800 100%);
+            color: #000;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.8em;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(255, 217, 61, 0.3);
+        }
+
+        .invite-badge {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.8em;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+        }
+
+        .descendants-section { margin-top: 8px; }
+
+        .descendant-stat {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .tree-badge {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(135deg, #8844ff 0%, #aa66ff 100%);
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75em;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(136, 68, 255, 0.3);
+            transition: all 0.2s;
+        }
+
+        .tree-badge.karma {
+            background: linear-gradient(135deg, #44aaff 0%, #66ccff 100%);
+            box-shadow: 0 2px 8px rgba(68, 170, 255, 0.3);
+        }
+
+        .descendant-stat:hover .tree-badge {
+            transform: scale(1.05);
+            box-shadow: 0 4px 16px rgba(136, 68, 255, 0.5);
+        }
+
+        .descendant-stat:hover .tree-badge.karma {
+            box-shadow: 0 4px 16px rgba(68, 170, 255, 0.5);
+        }
+
+        .invited-list { max-height: 120px; overflow-y: auto; }
+
+        .invited-list a {
+            display: inline-block;
+            margin: 3px 4px 3px 0;
+            padding: 4px 8px;
+            background: rgba(78, 205, 196, 0.15);
+            border-radius: 6px;
+            font-size: 0.75em;
+            color: #4ecdc4;
+            text-decoration: none;
+            transition: background 0.15s;
+        }
+        .invited-list a:hover { background: rgba(78, 205, 196, 0.25); }
+
+        .enrichment-section {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+
+        /* Loading */
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        #loading .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: #ff6b6b;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        #loading .loading-text {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.9em;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Tooltip */
+        #tooltip {
+            position: absolute;
+            background: rgba(10, 10, 20, 0.95);
+            backdrop-filter: blur(8px);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.8em;
+            pointer-events: none;
+            display: none;
+            z-index: 1000;
+            border: 1px solid rgba(255,255,255,0.1);
+            white-space: nowrap;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+        }
+
+        #tooltip .tt-name { color: #fff; font-weight: 600; }
+        #tooltip .tt-karma { color: #ffd93d; margin-left: 8px; font-weight: 500; }
+        #tooltip .tt-invites { color: #ff6b6b; font-weight: 500; }
+
+        /* Search Results Dropdown */
+        #search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(15, 15, 25, 0.95);
+            backdrop-filter: blur(12px);
+            border-radius: 10px;
+            margin-top: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            z-index: 100;
+        }
+
+        #search-results.visible { display: block; }
+
+        .search-result {
+            padding: 10px 14px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: background 0.15s;
+        }
+
+        .search-result:last-child { border-bottom: none; }
+        .search-result:hover { background: rgba(78, 205, 196, 0.15); }
+        .search-result .name { color: #fff; font-weight: 500; }
+        .search-result .karma { color: rgba(255,255,255,0.4); font-size: 0.85em; }
+
+        .search-wrapper {
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="sigma-container"></div>
+
+        <div id="loading">
+            <div class="spinner"></div>
+            <div class="loading-text">Loading 19k+ nodes...</div>
+        </div>
+
+        <div id="tooltip">
+            <span class="tt-name"></span>
+            <span class="tt-karma"></span>
+            <span class="tt-invites"></span>
+        </div>
+
+        <div id="controls">
+            <div class="logo">
+                <div class="logo-icon">🦞</div>
+                <h1>Lobste.rs Graph</h1>
+            </div>
+            <p class="subtitle">Invitation network visualization</p>
+
+            <div class="search-wrapper">
+                <input type="text" id="search" placeholder="Search users..." autocomplete="off">
+                <div id="search-results"></div>
+            </div>
+
+            <div class="section-title">Highlight</div>
+            <div class="button-group">
+                <button id="btn-highlight-karma" class="karma">Top Karma</button>
+                <button id="btn-highlight-inviters" class="inviters">Top Inviters</button>
+                <button id="btn-highlight-reset" class="active">All</button>
+            </div>
+
+            <div class="section-title">View</div>
+            <div class="button-group">
+                <button onclick="resetView()">Center</button>
+                <button onclick="zoomOut()">Zoom Out</button>
+                <button onclick="zoomToFit()">Fit All</button>
+            </div>
+
+            <div class="section-title">Filter</div>
+            <div class="filter-row">
+                <label>Min karma:</label>
+                <input type="range" id="karma-filter" min="0" max="1000" value="0">
+                <span class="value" id="karma-value">0</span>
+            </div>
+
+            <div class="stats">
+                <div class="stats-row">
+                    <span class="stat-label">Visible</span>
+                    <span class="stat-value" id="stat-visible">-</span>
+                </div>
+                <div class="stats-row">
+                    <span class="stat-label">Total</span>
+                    <span class="stat-value" id="stat-users">-</span>
+                </div>
+                <div class="stats-row">
+                    <span class="stat-label">Max karma</span>
+                    <span class="stat-value" id="stat-karma">-</span>
+                </div>
+            </div>
+
+            <div class="section-title">Top Inviters</div>
+            <div class="top-inviters" id="top-inviters"></div>
+
+            <div class="legend">
+                <div class="section-title">Legend</div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: linear-gradient(135deg, #ff6b6b, #ee5a5a);"></div>
+                    <span>50+ invites (super inviter)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: linear-gradient(135deg, #ffd93d, #f5c800);"></div>
+                    <span>5000+ karma (super user)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: linear-gradient(135deg, #4ecdc4, #44b8b0);"></div>
+                    <span>1000+ karma</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: #6c7b95;"></div>
+                    <span>100+ karma</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="node-detail">
+            <h2>
+                <span id="detail-username"></span>
+                <button class="close-btn" onclick="closeDetail()">×</button>
+            </h2>
+            <div id="detail-content"></div>
+        </div>
+
+        <div class="bottom-indicator" id="zoom-indicator">Zoom: <span id="zoom-level">100%</span></div>
+        <div class="bottom-indicator" id="lod-info">Rendering: <span id="lod-nodes">-</span> nodes</div>
+    </div>
+
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/graphology/0.25.4/graphology.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sigma.js/2.4.0/sigma.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/graphology-layout-forceatlas2/build/graphology-layout-forceatlas2.min.js"></script>
+
+    <script src="graph.js"></script>
+</body>
+</html>

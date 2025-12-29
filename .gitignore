@@ -1,0 +1,18 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Environment
+.env
+
+# Data (large/generated files)
+data/users.db
+data/users.html
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
